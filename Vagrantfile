@@ -1,6 +1,6 @@
 Vagrant.configure("2") do |config|
   # On définit l'image Ubuntu 22.04 pour toutes les machines
-  config.vm.box = "ubuntu/jammy64"
+  config.vm.box = "bento/ubuntu-22.04"
   config.vm.provider "vmware_desktop"
 
   # --- VM 1 : LA PASSERELLE (FIREWALL) ---
