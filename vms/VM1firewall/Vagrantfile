@@ -1,0 +1,17 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-22.04"
+  
+  config.vm.provider "vmware_desktop" do |v|
+    v.gui = false
+    v.linked_clone = true
+  end
+
+  config.vm.hostname = "VM1firewall"
+  # Interface vers le réseau WEB (LAN 1)
+  config.vm.network "private_network", ip: "192.168.100.1"
+  # Interface vers le réseau DB (LAN 2)
+  config.vm.network "private_network", ip: "192.168.10.1"
+
+  # Activation du routage pour que les paquets passent d'une carte à l'autre
+  config.vm.provision "shell", inline: "sysctl -w net.ipv4.ip_forward=1"
+end
