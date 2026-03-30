@@ -2,13 +2,32 @@ Vagrant.configure("2") do |config|
   config.vm.box = "bento/ubuntu-22.04"
 
   config.vm.provider "vmware_desktop" do |v|
-    v.gui = false
+    v.gui = true
     v.linked_clone = true
   end
 
   config.vm.hostname = "VM3BD"
   config.vm.network "private_network", ip: "192.168.10.10"
-
-  # Route statique : pour aller vers le réseau WEB (100.0), passe par la passerelle (10.1)
+ 
   config.vm.provision "shell", inline: "ip route add 192.168.100.0/24 via 192.168.10.1"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update
+    sudo apt-get install -y mysql-server
+    
+    # ROUTAGE : Pour que la VM3 puisse répondre aux requêtes venant de l'extérieur (via VM1)
+    sudo ip route add 192.168.91.1 via 192.168.10.1 dev eth1
+    sudo mysql
+
+    CREATE DATABASE mydatabase;
+
+    CREATE USER 'admin'@'192.168.100.10' IDENTIFIED BY '1234';
+    GRANT ALL PRIVILEGES ON mydatabase.* TO 'admin'@'192.168.100.10';
+    FLUSH PRIVILEGES;
+
+    EXIT;
+    echo "Configuration SQL terminée avec succès."
+    sudo systemctl restart mysql
+  SHELL
+
 end
